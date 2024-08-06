@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Customer Information</title>
+</head>
+<body>
+<h2 style="text-align: center;">Customer Information</h2>
+	<form action="Purchase" method="post">
+		<table align=center>
+			<tr>
+			               <td><input type="hidden" id="usernameField" name="usernameField" ></td>
+			           </tr>
+			<tr>
+				<td>Customer Name:</td>
+				<td><input type="text" name="cname" placeholder="Customer Name" required></td>
+			</tr>
+			<tr>
+				<td>Address:</td>
+				<td><textarea rows="4" cols="22" name="address" placeholder="Address" required></textarea></td>
+			</tr>
+			<tr>
+				<td><input type="reset" value="Reset"></td>
+				<td><input type="submit" value="Submit"></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>

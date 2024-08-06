@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice</title>
+    <!-- Your scripts and styles -->
+</head>
+<body>
+<div id="pr">
+    <!-- Invoice header -->
+    <center>
+        <h1>EASY MART</h1>
+        <h4>
+            124-2nd floor-LAKEMALL<br>
+            LAKEMALL, KOLKATA-700150<br>
+            TEL-9547432206<br>
+            VAT TIN-277330825650V W.E.F. 12.04.2018<br>
+            CIN no:- L51909MH20007PLC268269<br>
+            GSTIN-22-AAAAAA00000A-1-VB-6<br><br>
+        </h4>
+        <!-- Customer details -->
+        <h4 align="left">
+            Name: <span th:text="${details[0]}"></span><br>
+            Address: <span th:text="${details[1]}"></span><br>
+            Date: <span th:text="${details[2]}"></span><br>
+        </h4>
+        #INVOICE-<span th:text="${inv}"></span><br><br>
+        <!-- Invoice table -->
+        <table align="center" width="100%">
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>HSN/SAC Code</th>
+                    <th>Batch No.</th>
+                    <th>QTY</th>
+                    <th>Rate</th>
+                    <th>Taxable Value</th>
+                    <th>SGST</th>
+                    <th>CGST</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loop through invoice items -->
+                <tr th:each="invoice : ${items}">
+                    <td th:text="${invoice.itemId}"></td>
+                    <td th:text="${invoice.itemName}"></td>
+                    <td th:text="${invoice.hsnCode}"></td>
+                    <td th:text="${invoice.batchNo}"></td>
+                    <td th:text="${invoice.quantity}"></td>
+                    <td th:text="${invoice.sellPrice}"></td>
+                    <td th:text="${invoice.transanctionValue}"></td>
+                    <td th:text="${invoice.sgst}"></td>
+                    <td th:text="${invoice.cgst}"></td>
+                    <td th:text="${invoice.totalwithGst}"></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <!-- Summary section -->
+        <h3 align="right">
+            <!-- Add summary details here if necessary -->
+        </h3>
+    </center>
+</div>
+<center><button onclick="printDiv()">Print Invoice</button></center>
+</body>
+</html>

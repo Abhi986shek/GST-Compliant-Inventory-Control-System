@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu</title>
+</head>
+<body>
+    <h2>Welcome <span th:text="${uid}"></span>!</h2>
+    <p>Your role is <span th:text="${type}"></span>.</p>
+    <!-- Menu options based on role -->
+    <p><a href="/logout">Logout</a></p>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fetch Item Details</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            text-align: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            margin: 0 auto;
+        }
+        td {
+            padding: 5px 10px;
+        }
+        #buttons {
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $("#itemId").change(function() {
+                var itemId = document.getElementById("itemId").value;
+                $.ajax({
+                    url: '/getItem',
+                    type: 'GET',
+                    data: { id: itemId },
+                    success: function(item) {
+                        if (item) {
+                         $('#itemName').val(item.itemName);
+                   		 $('#itemMaker').val(item.itemMaker);
+                    	 $('#HSNCode').val(item.hsnCode);
+
+                        } else {
+                            alert("Item not found!");
+                        }
+                    },
+                    error: function() {
+                        alert("Error fetching item details!");
+                    }
+                });
+            });
+        });
+
+        function removeItemDetails() {
+            var itemId = document.getElementById("itemId").value;
+            var itemName = document.getElementById("itemName").value;
+            $.ajax({
+                url: '/removeItem/' +itemId+ '/' +itemName,
+                type: 'DELETE',
+                data: { id: itemId },
+                success: function(response) {
+                    if (response.success) {
+                        document.getElementById("itemName").innerText = "";
+                        document.getElementById("itemMaker").innerText = "";
+                        document.getElementById("HSNCode").innerText = "";
+                        alert("Item removed successfully!");
+                    } else {
+                        alert("Error removing item!");
+                    }
+                },
+                error: function() {
+                    alert("Error removing item!");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <form onsubmit="return false;">
+        <table>
+            <tr>
+                <td><label for="itemId">Item Id:</label></td>
+                <td><input type="text" id="itemId" name="itemId"></td>
+            </tr>
+            <tr>
+                <td>Item Name:</td>
+                <td><input type="text" id="itemName" name="itemName" readonly></span></td>
+            </tr>
+            <tr>
+                <td>Item Maker:</td>
+                <td><input type="text" id="itemMaker" name="itemMaker" readonly></span></td>
+            </tr>
+            <tr>
+                <td>HSN Code:</td>
+                <td><input type="text" id="HSNCode" name="HSNCode" readonly></span></td>
+            </tr>
+        </table>
+        <div id="buttons">
+            <button type="button" onclick="removeItemDetails()">Remove</button>
+            <input type="reset" value="Reset">
+        </div>
+    </form>
+</body>
+</html>
+
+
+
+

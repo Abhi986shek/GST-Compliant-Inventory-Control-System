@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+
+<style>
+    body {
+        text-align: center;
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        font-family: Arial, sans-serif;
+    }
+    table {
+        margin: 0 auto;
+    }
+    td, th {
+        padding: 5px 10px;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    button {
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #ddd;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script>
+$(document).ready( function() {
+    $("#rmv_by_id").on("click", function() {
+        $("#click_a").load("removeByID.html");
+    });
+});
+$(document).ready( function() {
+    $("#rmv_by_exp").on("click", function() {
+        $("#click_a").load("removeByExpiry.html");
+    });
+});
+</script>
+</head>
+<body>
+<h2 style="text-align: center;">Remove Stock</h2>
+	<table width="40%" align=center>
+		<tr>
+			<td><button id="rmv_by_id">Remove by Product ID</button></td>
+			<td><button id="rmv_by_exp">Remove by Expiry Date</button>
+	</table>
+	
+	<hr>
+				</div>
+				<div id="click_a"></div>
+				<div style="background-color: cyan">
+							        <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>			
+				</div>	
+	
+</body>
+</html>

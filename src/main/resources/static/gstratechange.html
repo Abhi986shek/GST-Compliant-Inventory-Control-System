@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>GST Rate Change</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            text-align: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            margin: 0 auto;
+        }
+        td {
+            padding: 5px 10px;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            // Fetch and populate categories on page load
+            $.ajax({
+                url: "/fetch-gst-rates",
+                type: "GET",
+                success: function(data) {
+                    var options = '<option disabled selected>Select</option>';
+                    $.each(data, function(index, category) {
+                        options += '<option value="' + category + '">' + category + '</option>';
+                    });
+                    $("#gstRatesSelect").html(options);
+                },
+                error: function() {
+                    alert("Failed to fetch GST categories.");
+                }
+            });
+
+            // Function to fetch item names based on selected category ID
+            $("#gstRatesSelect").change(function() {
+                var selectedCategoryId = $(this).val();
+                $.ajax({
+                    url: "/fetch-item-names/" + selectedCategoryId,
+                    type: "GET",
+                    success: function(data) {
+                        var options = '<option disabled selected>Select</option>';
+                        $.each(data, function(index, item) {
+                            options += '<option value="' + item + '">' + item + '</option>';
+                        });
+                        $("#itemNames").html(options);
+                        // Clear the rate field when category changes
+                        $("#rate").val('');
+                    },
+                    error: function() {
+                        alert("Failed to fetch item names.");
+                    }
+                });
+            });
+
+            // Function to fetch item rate based on selected item name
+            $("#itemNames").change(function() {
+                var selectedItemName = $(this).val();
+                $.ajax({
+                    url: "/fetch-item-rates/" + selectedItemName,
+                    type: "GET",
+                    success: function(data) {
+                        $("#rate").val(data);
+                    },
+                    error: function() {
+                        alert("Failed to fetch item rate.");
+                    }
+                });
+            });
+
+            // Custom reset functionality
+            $("input[type='reset']").click(function() {
+                $("#gstRatesSelect").val(''); // Reset category dropdown
+                $("#itemNames").html('<option disabled selected>Select</option>'); // Reset item dropdown
+                $("#rate").val(''); // Reset rate field
+            });
+
+            // AJAX form submission for updating GST rate
+            $("form").submit(function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                var formData = {
+                    itemNames: $("#itemNames").val(),
+                    rate: $("#rate").val()
+                };
+
+                $.ajax({
+                    url: "/updateGST",
+                    type: "POST",
+                    data: formData,
+                    success: function(response) {
+                        alert("Successfully updated the GST rate.");
+                        $("form")[0].reset(); // Reset the form
+                        $("#itemNames").html('<option disabled selected>Select</option>'); // Reset item dropdown
+                    },
+                    error: function() {
+                        alert("Failed to update the GST rate.");
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <form>
+        <table align="center">
+            <tr>
+                <td>Category</td>
+                <td>
+                    <select id="gstRatesSelect" name="category">
+                        <option disabled selected>Loading...</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Item</td>
+                <td>
+                    <select id="itemNames" name="itemNames">
+                        <option disabled selected>Select</option>
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Rate:</td>
+                <td><input type="text" name="rate" id="rate" placeholder="Rate" required>%</td>
+            </tr>
+            <tr>
+                <td><input type="reset" value="Reset"></td>
+                <td><input type="submit" value="Change"></td>
+            </tr>
+        </table>
+        <hr>
+        <div id="click">
+            <div style="background-color: cyan">
+                <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>
+            </div>
+        </div>
+    </form>
+</body>
+</html>
+
+
+

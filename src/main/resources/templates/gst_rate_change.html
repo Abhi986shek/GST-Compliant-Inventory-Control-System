@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GST Rate Change</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Function to populate categories dropdown on page load
+    function loadCategories() {
+        $.ajax({
+            url: 'get_cat',
+            type: 'GET',
+            success: function(data) {
+                var categoryOptions = '<option disabled selected>Select</option>';
+                data.forEach(function(category) {
+                    categoryOptions += '<option value="' + category + '">' + category + '</option>';
+                });
+                $('#cat').html(categoryOptions);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching categories:', error);
+            }
+        });
+    }
+
+    // Function to fetch sub-categories based on selected category
+    $('#cat').on('change', function() {
+        var selectedCategory = $(this).val();
+        $.ajax({
+            url: 'find_sub_cat?category=' + encodeURIComponent(selectedCategory),
+            type: 'GET',
+            success: function(data) {
+                var subCategoryOptions = '<option disabled selected>Select</option>';
+                data.forEach(function(subCategory) {
+                    subCategoryOptions += '<option value="' + subCategory + '">' + subCategory + '</option>';
+                });
+                $('#sub').html(subCategoryOptions);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching sub-categories:', error);
+            }
+        });
+    });
+
+    // Function to fetch rate based on selected sub-category
+    $('#sub').on('change', function() {
+        var selectedItem = $(this).val();
+        $.ajax({
+            url: 'getRate?item=' + encodeURIComponent(selectedItem),
+            type: 'GET',
+            success: function(data) {
+                $('#rate').val(data);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching rate:', error);
+            }
+        });
+    });
+
+    // Form submission with AJAX
+    $('#gstForm').on('submit', function(event) {
+        event.preventDefault();
+        var formData = $(this).serialize();
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                alert(response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error submitting form:', error);
+            }
+        });
+    });
+
+    // Load categories dropdown on page load
+    loadCategories();
+});
+</script>
+</head>
+<body>
+<h2 style="text-align: center;">GST Rate Change</h2>
+<form id="gstForm" action="changeGstRate" method="post">
+    <table align="center">
+        <tr>
+            <td>Category</td>
+            <td>
+                <select name="category" id="cat">
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Sub Category</td>
+            <td>
+                <select name="sub_cat" id="sub">
+                    <option disabled selected>Select</option>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Rate:</td>
+            <td><input type="text" name="rate" id="rate" placeholder="Rate" required>%</td>
+        </tr>
+        <tr>
+            <td><input type="reset" value="Reset"></td>
+            <td><input type="submit" value="Change"></td>
+        </tr>
+    </table>
+</form>
+
+<hr>
+<div style="background-color: cyan">
+    <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>
+</div>
+
+</body>
+</html>
+
+

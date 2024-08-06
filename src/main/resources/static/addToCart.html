@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Item to Cart</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            text-align: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            margin: 0 auto;
+        }
+        td, th {
+            padding: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            function fetchQty(itemid, batchno) {
+                $.ajax({
+                    url: '/fetchQty',
+                    type: 'GET',
+                    data: { itemid: itemid, batchno: batchno },
+                    success: function(response) {
+                        $('#qty').val(response);
+                    },
+                    error: function() {
+                        alert('Error fetching quantity!');
+                    }
+                });
+            }
+
+            $('#batchno').on('change', function() {
+                var itemid = $('#itemid').val();
+                var batchno = $(this).val();
+                fetchQty(itemid, batchno);
+            });
+
+            $('#addCartForm').on('submit', function(event) {
+                event.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    url: '/validateQuantity',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response === 'valid') {
+                            alert('Item added to cart successfully.');
+                            $('#addCartForm')[0].reset();
+                            $('#i').html('');
+                        } else {
+                            alert(response);
+                        }
+                    },
+                    error: function() {
+                        alert('Error validating quantity!');
+                    }
+                });
+            });
+
+            $("#itemid").change(function() {
+                var itemId = document.getElementById("itemid").value;
+                $.ajax({
+                    url: '/getItem',
+                    type: 'GET',
+                    data: { id: itemId },
+                    success: function(item) {
+                        if (item) {
+                            $('#itemNameHidden').val(item.itemName);
+                        } else {
+                            alert("Item not found!");
+                        }
+                    },
+                    error: function() {
+                        alert("Error fetching item details!");
+                    }
+                });
+            });
+
+            $("#itemid").change(function() {
+                var selectedCategoryId = $(this).val();
+                $.ajax({
+                    url: "/fetch-batch-no/" + selectedCategoryId,
+                    type: "GET",
+                    success: function(data) {
+                        var options = '<option disabled selected>Select</option>';
+                        $.each(data, function(index, batchNo) {
+                            options += '<option value="' + batchNo + '">' + batchNo + '</option>';
+                        });
+                        $("#batchno").html(options);
+                        $("#rate").val('');
+                    },
+                    error: function() {
+                        alert("Failed to fetch item names.");
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <h2 style="text-align: center;">Add To Cart</h2>
+    <form id="addCartForm">
+        <table align="center">
+            <tr>
+                <td><input type="hidden" id="usernameField" name="usernameField" ></td>
+            </tr>
+            <tr>
+                <td>Item Id:</td>
+                <td>
+                    <select name="itemid" id="itemid" required>
+                        <option value="">Select Item ID</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Item Name:</td>
+                <td><input type="text" id="itemNameHidden" name="itemName" readonly></td>
+            </tr>
+            <tr>
+                <td>Batch No:</td>
+                <td>
+                    <select name="batchno" id="batchno" required>
+                        <option value="">Select Batch No</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Quantity:</td>
+                <td><input type="number" name="qty" id="qty" placeholder="Quantity" required></td>
+            </tr>
+            <tr>
+                <td><input type="reset" value="Reset"></td>
+                <td><input type="submit" value="Submit"></td>
+            </tr>
+        </table>
+        <hr>
+        <div id="clk">
+            <div style="background-color: cyan">
+                <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>
+                <div id="i" style="color:red;text-align:center;"></div>
+            </div>
+        </div>
+    </form>
+</body>
+</html>

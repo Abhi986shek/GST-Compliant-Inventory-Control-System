@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Add New User</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            text-align: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            margin: 0 auto;
+        }
+        td {
+            padding: 5px 10px;
+        }
+    </style>
+    <script>
+        function submitForm(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            var formData = {
+                userid: $("input[name='userid']").val(),
+                pass: $("input[name='pass']").val(),
+                name: $("input[name='name']").val(),
+                type: $("select[name='type']").val()
+            };
+
+            $.ajax({
+                url: '/addEmp',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    alert("Employee added successfully.");
+                    $("#addEmpForm")[0].reset(); // Reset the form after successful submission
+                },
+                error: function() {
+                    alert("Error adding employee!");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2 style="text-align: center;">Add Employee</h2>
+    <form id="addEmpForm" onsubmit="submitForm(event)">
+        <table align="center">
+            <tr>
+                <td>Username</td>
+                <td><input type="text" name="userid" placeholder="Username" required></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="text" name="pass" placeholder="Password" required></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td><input type="text" name="name" placeholder="Name" required></td>
+            </tr>
+            <tr>
+                <td>Type</td>
+                <td>
+                    <select name="type">
+                        <option>Select</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Stockist">Stockist</option>
+                        <option value="Cashier">Cashier</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="reset" value="Reset"></td>
+                <td><input type="submit" value="Submit"></td>
+            </tr>
+        </table>
+        <hr>
+        <div style="background-color: cyan">
+            <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>            
+        </div>    
+    </form>
+</body>
+</html>

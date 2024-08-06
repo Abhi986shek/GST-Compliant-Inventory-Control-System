@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Cashier Home</title>
+	<style>
+	       .total-transaction-value {
+	           background-color: #f2f2f2;
+	           border: 2px solid #007bff;
+	           padding: 10px;
+	           margin-top: 20px;
+	           text-align: center;
+	           font-size: 1.5em;
+	           font-weight: bold;
+	           color: #007bff;
+	           border-radius: 10px;
+	       }
+	   </style>
+    <h1>WELCOME <span id="username" th:text="${#strings.capitalize(username)}"></span></h1>
+    <h2>ROLE: <span th:text="${#strings.toUpperCase(role)}"></span></h2>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Function to fetch cart items for the logged-in user
+            function fetchCartItems(username) {
+                $.get("/fetchCartItems/" + encodeURIComponent(username), function(cartItems) {
+                    var totalTransactionValue = 0; // Initialize total value
+                    var table = '<table width="100%" border="1">';
+                    table += '<tr><th>Cart ID</th><th>Item ID</th><th>Item Name</th><th>Batch No</th><th>Quantity</th><th>Total Transaction Value</th><th>Action</th></tr>';
+                    
+                    $.each(cartItems, function(index, item) {
+                        table += '<tr>';
+                        table += '<td>' + item.cartId + '</td>';
+                        table += '<td>' + item.itemId + '</td>';
+                        table += '<td>' + item.itemName + '</td>';
+                        table += '<td>' + item.batchNo + '</td>';
+                        table += '<td>' + item.quantity + '</td>';
+                        table += '<td>' + item.totalwithGst + '</td>';
+                        // Add hidden fields to capture data for submission
+                        table += '<td><input type="hidden" name="cartId[]" value="' + item.cartId + '">';
+                        table += '<input type="hidden" name="itemId[]" value="' + item.itemId + '">';
+                        table += '<input type="hidden" name="itemName[]" value="' + item.itemName + '">';
+                        table += '<input type="hidden" name="batchNo[]" value="' + item.batchNo + '">';
+                        table += '<input type="hidden" name="quantity[]" value="' + item.quantity + '">';
+                        table += '<input type="hidden" name="totalwithGst[]" value="' + item.totalwithGst + '">';
+                        table += '<button class="delete-item" data-item-id="' + item.cartId + '">Delete</button></td>';
+                        table += '</tr>';
+                        
+                        // Accumulate total transaction value
+                        totalTransactionValue += parseFloat(item.totalwithGst);
+                    });
+                    
+                    table += '</table>';
+                    // Append the table to div#clk
+                    $("#clk").html(table);
+
+                    // Add space after cart items table
+                    $("#clk").append('<div style="margin-top: 20px;"></div>');
+
+					// Display the total transaction value in a styled way
+					                    var totalValueHtml = '<div id="totalValue" class="total-transaction-value">';
+					                    totalValueHtml += 'Total Transaction Value:' + totalTransactionValue.toFixed(2);
+					                    totalValueHtml += '</div>';
+					                    $("#clk").append(totalValueHtml);
+					
+
+					// Add space 
+				 $("#clk").append('<div style="margin-top: 20px;"></div>');										
+                    // Add Checkout button
+                    var checkoutButton = '<button id="checkout_cart" style="background-color: blue; color: white; font-weight: bold; display: block; margin: 0 auto;">Checkout</button>';
+                    $("#clk").append(checkoutButton);
+
+                    // Handle Checkout button click
+                    $("#checkout_cart").on("click", function() {
+                         var username = $("#username").text().trim();
+						 $("#clk").load("CustInfo.html", function() {
+						  // Set the username in the addToCart.html
+						  $("#usernameField").val(username);
+						  });
+
+                    });
+
+                    // Bind delete button click events
+                    $(".delete-item").on("click", function() {
+                        var cartId = $(this).data("item-id");
+                        deleteCartItem(cartId);
+                    });
+                });
+            }
+
+            // Function to delete cart item via AJAX
+            function deleteCartItem(cartId) {
+                $.ajax({
+                    url: '/cart/delete',
+                    type: 'POST',
+                    data: { cartId: cartId },
+                    success: function(response) {
+                        // Reload cart view after deletion
+                        fetchCartItems($("#username").text().trim());
+                    },
+                    error: function() {
+                        alert('Error deleting item!');
+                    }
+                });
+            }
+
+            // Add To Cart button click handler (assuming addToCart.html is loaded dynamically)
+            $("#add_cart").on("click", function() {
+                var username = $("#username").text().trim(); // Get username from the span
+                $("#clk").load("addToCart.html", function() {
+                    // Set the username in the addToCart.html
+                    $("#usernameField").val(username);
+                    // After loading addToCart.html, make an AJAX call to fetch item IDs
+                    $.get("/fetch-item-id", function(data) {
+                        var options = '<option disabled selected>Select</option>';
+                        $.each(data, function(index, itemId) {
+                            options += '<option value="' + itemId + '">' + itemId + '</option>';
+                        });
+                        $("#itemid").html(options);
+                    });
+                });
+            });
+
+            // View Cart button click handler
+            $("#view_cart").on("click", function() {
+                fetchCartItems($("#username").text().trim()); // Fetch and display cart items
+            });
+
+            // Handle Logout link
+            $("a[href='/logout']").on("click", function(e) {
+                e.preventDefault();
+                // Implement logout logic here, redirect or clear session
+            });
+        });
+    </script>
+</head>
+<body>
+    <div style="background-color: cyan">
+        <hr>
+        <table width="100%" border="0" style="text-align: center;">
+            <tr>
+                <td><button id="add_cart">Add To Cart</button></td>
+                <td><button id="view_cart">View Cart</button></td>
+            </tr>
+        </table>
+        <hr>
+    </div>
+    <div id="clk">
+        <!-- Cart items and checkout button will be dynamically loaded here -->
+        <div style="background-color: cyan">
+            <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>
+        </div>
+    </div>
+</body>
+</html>

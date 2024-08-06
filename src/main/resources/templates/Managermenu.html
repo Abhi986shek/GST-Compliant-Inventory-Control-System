@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><h1>WELCOME   <span th:text="${#strings.capitalize(username)}"></span></h1>
+			<h2>ROLE : 	<span th:text="${#strings.toUpperCase(role)}"></span>
+ </h2>
+<title>Manager Home</title>
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<script>
+	$(document).ready( function() {
+	    $("#add_emp").on("click", function() {
+	        $("#click").load("add_employee.html");
+	    });
+	});
+	 $(document).ready(function() {
+            $("#change_gst_rate").on("click", function() {
+                $("#click").load("gstratechange.html", function() {
+                    // AJAX call to fetch data once gst_rate_change.html is loaded
+                    $.get("/fetch-gst-rates", function(data) {
+                        // Assuming data is an array of GST rates fetched from backend
+                        var options = '<option disabled selected>Select</option>';
+                        $.each(data, function(index, cat) {
+                            options += '<option value="' + cat + '">' + cat + '</option>';
+                        });
+                        // Assuming you have a select dropdown with id 'gstRatesSelect'
+                        $("#gstRatesSelect").html(options);
+                    });
+                });
+            });
+        });
+	$(document).ready( function() {
+	    $("#sales_info").on("click", function() {
+	        $("#click").load("SalesInfo.html");
+	    });
+	});
+	$(document).ready( function() {
+	    $("#rmv_emp").on("click", function() {
+	        $("#click").load("removeEmp.html");
+	    });
+	});
+
+ </script>
+ </head>
+
+<body>
+	<div style="background-color: cyan">
+		<hr>
+		<table width="100%" border="0" style="text-align: center;">
+			<tr>
+				<td><button id="add_emp">Add Employee</button></td>
+				<td><button id="rmv_emp">Manage Employee</button></td>
+				<td><button id="change_gst_rate">Change GST Rate</button></td>
+				<td><button id="sales_info">Sales Information</button></td>
+			</tr>
+		</table>
+		<hr>
+	</div>
+	<div id="click">
+	<div style="background-color: cyan">
+				        <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>			
+	</div>	
+</body>
+</html>
+
+
+

@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Add Stock</title>
+
+<style>
+    body {
+        text-align: center;
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        font-family: Arial, sans-serif;
+    }
+    table {
+        margin: 0 auto;
+    }
+    td, th {
+        padding: 10px;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    button {
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #ddd;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('form').on('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var formData = $(this).serialize(); // Serialize the form data
+
+        $.ajax({
+            url: 'addQty',
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                alert('Successfully added data.');
+                $('form')[0].reset(); // Reset the form
+            },
+            error: function(xhr, status, error) {
+                console.error("Status: " + status + "\nError: " + error);
+                alert('Error adding data.');
+            }
+        });
+    });
+
+    // Fetch item details
+    $("#itemid").change(function() {
+        var itemId = $(this).val();
+        $.ajax({
+            url: '/getItem',
+            type: 'GET',
+            data: { id: itemId },
+            success: function(item) {
+                if (item) {
+                    $('#itemNameHidden').val(item.itemName);
+                } else {
+                    alert("Item not found!");
+                }
+            },
+            error: function() {
+                alert("Error fetching item details!");
+            }
+        });
+    });
+
+    // Fetch batch details
+    $("#batchno").change(function() {
+        var itemId = $("#itemid").val();
+        var batchNo = $("#batchno").val();
+        $.ajax({
+            url: '/getBatch',
+            type: 'GET',
+            data: { itemid: itemId, batchno: batchNo },
+            success: function(item) {
+                if (item) {
+                    // Convert date strings to YYYY-MM-DD format
+                    var mfdDate = formatDate(item.mfDate);
+                    var expDate = formatDate(item.expDate);
+
+                    // Update form fields
+                    $('#mfd').val(mfdDate);
+                    $('#exp').val(expDate);
+                    $('#vendorName').val(item.vendorId);
+                    $('#qty').val(item.quantity);
+                    $('#bprice').val(item.buyPrice);
+                    $('#sprice').val(item.sellPrice);
+                } else {
+                    alert("No Existing batch found");
+                }
+            },
+            error: function() {
+                alert("No Existing batch found");
+            }
+        });
+    });
+
+    function formatDate(dateString) {
+        // Date format: "YYYY-MM-DD HH:MM:SS"
+        var datePart = dateString.split(' ')[0]; // "YYYY-MM-DD"
+        return datePart;
+    }
+});
+
+
+</script>
+</head>
+<body>
+<h2 style="text-align: center;">Add Stock</h2>
+<form>
+    <table align="center">
+        <tr>
+            <td>Item Id:</td>
+            <td><select name="itemid" id="itemid" required>
+                <option value="">Select Item ID</option>
+                <!-- Populate options dynamically if needed -->
+            </select></td>
+        </tr>
+        <tr>
+            <td>Item Name:</td>
+            <td><input type="text" id="itemNameHidden" name="itemName" readonly></td>
+        </tr>
+        <tr>
+            <td>Batch No:</td>
+            <td><input type="text" id="batchno" name="batchno" placeholder="Batch No" required></td>
+        </tr>
+        <tr>
+            <td>Manufacture Date:</td>
+            <td><input type="date" name="mfd" id="mfd" placeholder="Manufacture Date" required></td>
+        </tr>
+        <tr>
+            <td>Expiry Date:</td>
+            <td><input type="date" name="exp" id="exp" placeholder="Expiry Date" required></td>
+        </tr>
+        <tr>
+            <td>Vendor Name:</td>
+            <td><select name="vendorName" id="vendorName" required>
+                <option value="">Select Vendor Name</option>
+                <!-- Populate options dynamically if needed -->
+            </select></td>
+        </tr>
+        <tr>
+            <td>Quantity:</td>
+            <td><input type="number" name="qty" id="qty" placeholder="Quantity" required></td>
+        </tr>
+        <tr>
+            <td>Buying Price:</td>
+            <td><input type="number" name="bprice" id="bprice" placeholder="Buying Price" required></td>
+        </tr>
+        <tr>
+            <td>Selling Price:</td>
+            <td><input type="number" name="sprice" id="sprice" placeholder="Selling Price" required></td>
+        </tr>
+        <tr>
+            <td><input type="reset" value="Reset"></td>
+            <td><input type="submit" value="Submit"></td>
+        </tr>
+    </table>
+    <hr>
+    <div style="background-color: cyan">
+        <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>
+    </div>
+</form>
+</body>
+</html>

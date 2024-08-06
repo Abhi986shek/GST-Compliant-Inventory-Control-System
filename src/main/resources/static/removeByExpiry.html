@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Remove By Expiry</title>
+    <style>
+        body {
+            text-align: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            margin: 0 auto;
+        }
+        td {
+            padding: 5px 10px;
+        }
+        #buttons {
+            margin-top: 20px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function fetchItemsByExpiry() {
+            var date = $('#expiryDate').val();
+            $.ajax({
+                url: '/fetchExp',
+                type: 'GET',
+                data: { date: date },
+                success: function(data) {
+                    if (Array.isArray(data) && data.length > 0) {
+                        let tableContent = '<table border="1"><tr><th>Item ID</th><th>Item Name</th><th>Batch No</th><th>Quantity</th><th>Expiry Date</th><th>Manufacture Date</th><th>Buying Price</th><th>Selling Price</th></tr>';
+                        data.forEach(item => {
+                            tableContent += `<tr>
+                                <td>${item.itemId}</td>
+                                <td>${item.itemName || 'N/A'}</td>
+                                <td>${item.batchNo}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.expDate}</td>
+                                <td>${item.mfDate}</td>
+                                <td>${item.buyPrice}</td>
+                                <td>${item.sellPrice}</td>
+                            </tr>`;
+                        });
+                        tableContent += '</table>';
+                        $('#add').html(tableContent);
+                        $('#message').text('');
+                    } else {
+                        $('#add').html('');
+                        $('#message').text('No items found for the selected expiry date.');
+                    }
+                },
+                error: function() {
+                    alert("Error fetching items!");
+                }
+            });
+        }
+
+        function removeItemsByExpiry() {
+            var date = $('#expiryDate').val();
+            $.ajax({
+                url: '/removeExp',
+                type: 'DELETE',
+                data: { date: date },
+                success: function(response) {
+                    if (response === 'valid') {
+                         alert('Expired stocks removed successfully.');
+                        fetchItemsByExpiry(); // Reload items after removal
+                    } else {
+                        $('#message').text("Error removing items.");
+                    }
+                },
+                error: function() {
+                    alert("Error removing items!");
+                }
+            });
+        }
+
+        function resetForm() {
+            $('#expiryDate').val(''); // Clear the input field
+            $('#add').html(''); // Clear displayed items
+            $('#message').text(''); // Clear any displayed messages
+        }
+
+        $(document).ready(function() {
+            $('#loadButton').on('click', fetchItemsByExpiry); // Fetch items on load button click
+            $('#removeButton').on('click', removeItemsByExpiry); // Remove items on remove button click
+            $('#resetButton').on('click', resetForm); // Reset form on reset button click
+        });
+    </script>
+</head>
+<body>
+    <h1>Remove Items By Expiry Date</h1>
+    <input type="date" id="expiryDate" name="expiryDate">
+    <button id="loadButton">Load Items</button>
+    <button id="removeButton">Remove Items</button>
+    <button id="resetButton">Reset</button>
+    <div id="message"></div>
+    <div id="add"></div>
+</body>
+</html>

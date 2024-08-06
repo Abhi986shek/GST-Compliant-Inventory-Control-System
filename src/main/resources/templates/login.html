@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Inventory Control</title>
+</head>
+<body style="text-align: center;">
+    <h1>Welcome to GST Compliant Inventory Control System</h1>
+    <form action="login_check" method="post">
+        <table style="width: 20%" align="center">
+            <tr>
+                <td>Username</td>
+                <td><input type="text" name="uid" placeholder="Username" required></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="password" name="pass" placeholder="Password" required></td>
+            </tr>
+            <tr>
+                <td>Type</td>
+                <td>
+                    <select name="type">
+                        <option>Select</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Stockist">Stockist</option>
+                        <option value="Cashier">Cashier</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" value="Login">
+        <div style="color: red;">
+            <span th:text="${error}"></span>
+        </div>
+    </form>
+</body>
+</html>

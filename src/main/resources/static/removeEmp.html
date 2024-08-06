@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Employee</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            text-align: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            margin: 0 auto;
+        }
+        td {
+            padding: 5px 10px;
+        }
+    </style>
+    <script>
+        function fetchUserDetails() {
+            var userid = document.getElementById("userid").value;
+            $.ajax({
+                url: '/getUserDetails',
+                type: 'GET',
+                data: { userid: userid },
+                success: function(user) {
+                    if (user) {
+                        document.getElementById("username").value = user.name;
+                        document.getElementById("status").value = user.status;
+                    } else {
+                        alert("User not found!");
+                    }
+                },
+                error: function() {
+                    alert("Error fetching user details!");
+                }
+            });
+        }
+
+        function removeUserDetails() {
+            var userid = document.getElementById("userid").value;
+            $.ajax({
+                url: '/deleteUser/' + userid,
+                type: 'DELETE',
+                success: function(response) {
+                    alert("Employee removed successfully.");
+                    document.getElementById("empForm").reset();
+                },
+                error: function() {
+                    alert("Error removing employee!");
+                }
+            });
+        }
+
+        function updateUserStatus() {
+            var userid = document.getElementById("userid").value;
+            var status = document.getElementById("status").value;
+            $.ajax({
+                url: '/rmv_emp',
+                type: 'POST',
+                data: { userid: userid, status: status },
+                success: function(response) {
+                    alert("Employee status updated successfully.");
+                    document.getElementById("empForm").reset();
+                },
+                error: function() {
+                    alert("Error updating employee status!");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h2 style="text-align: center;">Manage Employee</h2>
+    <form id="empForm" onsubmit="return false;">
+        <table align="center">
+            <tr>
+                <td>Userid</td>
+                <td><input type="text" id="userid" name="userid" oninput="fetchUserDetails()" placeholder="Userid" required></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td><input type="text" required name="name" id="username" placeholder="Name" readonly></td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td>
+                    <select id="status" name="status">
+                        <option>Select</option>
+                        <option value="Block">Block</option>
+                        <option value="Unblock">Unblock</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="reset" value="Reset"></td>
+                <td>
+                    <button type="button" onclick="updateUserStatus()">Submit</button>
+                    <button type="button" onclick="removeUserDetails()">Remove</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <hr>
+    <div style="background-color: cyan">
+        <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>
+    </div>  
+</body>
+</html>
+
+
+
+

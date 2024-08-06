@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Add Vendor</title>
+<style>
+    body {
+        text-align: center;
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        font-family: Arial, sans-serif;
+    }
+    table {
+        margin: 0 auto;
+    }
+    td, th {
+        padding: 5px 10px;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    button {
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #ddd;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('form').on('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting via the browser
+
+            var formData = $(this).serialize(); // Serialize form data
+
+            $.ajax({
+                url: 'add_vend',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    console.log(response); // Log the response to debug
+                    alert('Successfully added data.');
+                    $('form')[0].reset(); // Reset the form
+                },
+                error: function() {
+                    alert('Error adding data.');
+                }
+            });
+        });
+    });
+</script>
+</head>
+<body>
+<h2 style="text-align: center;">Add Vendor</h2>
+<form action="add_vend" method="post">
+    <table align="center">
+        <tr>
+            <td>Vendor Name:</td>
+            <td><input type="text" name="vendorname" placeholder="Vendor Name" required></td>
+        </tr>
+        <tr>
+            <td>Contact Name:</td>
+            <td><input type="text" name="vendorname2" placeholder="Contact Name" required><br></td>
+        </tr>
+        <tr>
+            <td>Phone No:</td>
+            <td><input type="number" name="phno" pattern="^\d{10}$" maxlength="10" placeholder="Phone No" required></td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td><input type="email" name="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" placeholder="Email" required></td>
+        </tr>
+        <tr>
+            <td>Address:</td>
+            <td><textarea rows="4" cols="22" name="address" placeholder="Address" required></textarea></td>
+        </tr>
+        <tr>
+            <td>PIN:</td>
+            <td><input type="number" name="pin" pattern="^\d{10}$" maxlength="6" placeholder="PIN" required></td>
+        </tr>
+        <tr>
+            <td>GSTIN:</td>
+            <td><input type="text" name="gstn" maxlength="15" placeholder="GSTIN" required></td>
+        </tr>
+        <tr>
+            <td><input type="reset" value="Reset"></td>
+            <td><input type="submit" value="Submit"></td>
+        </tr>
+    </table>
+    <hr>
+    <div style="background-color: cyan">
+        <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>
+    </div>
+</form>
+</body>
+</html>
+
+

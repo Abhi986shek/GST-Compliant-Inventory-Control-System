@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Add New Product</title>
+<style>
+    body {
+        text-align: center;
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        font-family: Arial, sans-serif;
+    }
+    table {
+        margin: 0 auto;
+    }
+    td, th {
+        padding: 5px 10px;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+    button {
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #ddd;
+    }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    function fetchCategories() {
+        $.ajax({
+            url: 'fetch-gst-rates',
+            type: 'GET',
+            success: function(response) {
+                var options = '<option value="">Select Category</option>';
+                $.each(response, function(index, item) {
+                    options += '<option value="' + item + '">' + item + '</option>';
+                });
+                options += '<option value="add_new_cat">Add New Category</option>'; // Add the "Add New Category" option here
+                $('#gstRatesSelect1').html(options);
+            },
+            error: function() {
+                console.error('Error fetching categories.');
+            }
+        });
+    }
+
+    function fetchSubCategories(category) {
+        $.ajax({
+            url: 'find_sub_cat',
+            type: 'GET',
+            data: { category: category },
+            success: function(response) {
+                var options = '<option value="">Select Sub-Category</option>';
+                $.each(response, function(index, item) {
+                    options += '<option value="' + item + '">' + item + '</option>';
+                });
+                options += '<option value="add_new">Add New Sub-Category</option>';
+                $('#itemNames').html(options);
+            },
+            error: function() {
+                console.error('Error fetching sub-categories.');
+            }
+        });
+    }
+    
+        // Validate itemid
+    $('#itemid').on('change', function() {
+        var itemid = $(this).val();
+        $.ajax({
+            url: 'validate_itemid',
+            type: 'GET',
+            data: { itemid: itemid },
+            success: function(response) {
+                if (response.exists) {
+                    alert('Item ID already exists.');
+                    $('#itemid').val(''); // Clear the input
+                }
+            },
+            error: function() {
+                console.error('Error validating item ID.');
+            }
+        });
+    });
+    
+        // Validate itemName
+    $('#itemname').on('change', function() {
+        var itemName = $(this).val();
+        $.ajax({
+            url: 'validate_itemname',
+            type: 'GET',
+            data: { itemName: itemName },
+            success: function(response) {
+                if (response.exists) {
+                    alert('Item Name already exists.');
+                    $('#itemname').val(''); // Clear the input
+                }
+            },
+            error: function() {
+                console.error('Error validating item Name.');
+            }
+        });
+    });
+
+    // Initial fetch of categories
+    fetchCategories();
+
+    // Handle form submission
+    $('form').on('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        var formData = $(this).serialize(); // Serialize form data
+
+        $.ajax({
+            url: 'input_product',
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                alert('Successfully added data.');
+                $('form')[0].reset(); // Reset the form
+                // Re-fetch categories to repopulate the dropdown
+                fetchCategories();
+                // Reset sub-category dropdown
+                $('#itemNames').html('<option value="">Select Sub-Category</option>');
+            },
+            error: function(xhr, status, error) {
+                console.error("Status: " + status + "\nError: " + error);
+                alert('Error adding data.');
+            }
+        });
+    });
+
+    $('#gstRatesSelect1').change(function() {
+        var selectedCategoryId = $(this).val();
+        fetchSubCategories(selectedCategoryId);
+    });
+
+    $(document).on('change', '#itemNames', function() {
+        if ($(this).val() === 'add_new') {
+            $(this).replaceWith('<input type="text" name="sub_cat" id="itemNames" placeholder="Enter new sub-category" required>');
+        }
+    });
+
+
+
+    // Convert category dropdown to text field if "Add New Category" is selected
+    $(document).on('change', '#gstRatesSelect1', function() {
+        if ($(this).val() === 'add_new_cat') {
+            $(this).replaceWith('<input type="text" name="category" id="gstRatesSelect1" placeholder="Enter new category" required>');
+        }
+    });
+});
+</script>
+</head>
+<body>
+<h2 style="text-align: center;">Add New Product</h2>
+<form>
+    <table align="center">
+        <tr>
+            <td>Item Id</td>
+            <td><input type="text" name="itemid" id="itemid" placeholder="Item Id" required></td>
+        </tr>
+        <tr>
+            <td>Item Name</td>
+            <td><input type="text" name="itemname" id="itemname" placeholder="Item Name" required></td>
+        </tr>
+        <tr>
+            <td>Maker</td>
+            <td><input type="text" name="maker" placeholder="Maker" required></td>
+        </tr>
+        <tr>
+            <td>HSN Code</td>
+            <td><input type="text" name="hsn" placeholder="HSN Code" required></td>
+        </tr>
+        <tr>
+            <td>Category</td>
+            <td><select name="category" id="gstRatesSelect1" required>
+                <option value="">Select Category</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td>Sub-Category</td>
+            <td><select name="sub_cat" id="itemNames" required>
+                <option value="">Select Sub-Category</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td>GST Rate</td>
+            <td><input type="text" name="gstrate" placeholder="GST Rate" required></td>
+        </tr>
+        <tr>
+            <td style="text-align: center"><input type="reset" value="Reset"></td>
+            <td style="text-align: center"><input type="submit" value="Submit"></td>
+        </tr>
+    </table>
+    <hr>
+    <div style="background-color: cyan">
+        <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>
+    </div>
+</form>
+</body>
+</html>

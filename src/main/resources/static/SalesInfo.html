@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Sales information</title>
+</head>
+<body>
+<div id="cl">
+    <center>
+        <form action="/generateReport" method="post">
+            <table>
+                <tr>
+                    <td>Start Date:</td>
+                    <td><input type="date" id="transactionStartDate" name="transactionStartDate" required></td>
+                </tr>
+                <tr>
+                    <td>End Date:</td>
+                    <td><input type="date" id="transactionEndDate" name="transactionEndDate" required></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center"><input type="submit" value="Generate Report"></td>
+                </tr>
+            </table>
+        </form>
+    </center>
+    <hr>
+</div>
+<div style="background-color: cyan">
+    <a href="/logout" style="position: absolute; top: 10px; right: 10px;">Logout</a>
+</div>
+</body>
+</html>
